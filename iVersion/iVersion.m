@@ -540,13 +540,6 @@ static NSString *const iVersionMacAppStoreURLFormat = @"macappstore://itunes.app
             {
                 [self.delegate iVersionVersionCheckDidFailWithError:self.downloadError];
             }
-            
-            //deprecated code path
-            else if ([self.delegate respondsToSelector:@selector(iVersionVersionCheckFailed:)])
-            {
-                NSLog(@"iVersionVersionCheckFailed: delegate method is deprecated, use iVersionVersionCheckDidFailWithError: instead");
-                [self.delegate performSelector:@selector(iVersionVersionCheckFailed:) withObject:self.downloadError];
-            }
             return;
         }
         
@@ -559,13 +552,6 @@ static NSString *const iVersionMacAppStoreURLFormat = @"macappstore://itunes.app
             if ([self.delegate respondsToSelector:@selector(iVersionDidDetectNewVersion:details:)])
             {
                 [self.delegate iVersionDidDetectNewVersion:mostRecentVersion details:details];
-            }
-            
-            //deprecated code path
-            else if ([self.delegate respondsToSelector:@selector(iVersionDetectedNewVersion:details:)])
-            {
-                NSLog(@"iVersionDetectedNewVersion:details: delegate method is deprecated, use iVersionDidDetectNewVersion:details: instead");
-                [self.delegate performSelector:@selector(iVersionDetectedNewVersion:details:) withObject:mostRecentVersion withObject:details];
             }
             
             //check if ignored
@@ -756,7 +742,7 @@ static NSString *const iVersionMacAppStoreURLFormat = @"macappstore://itunes.app
 
 - (void)setAppStoreIDOnMainThread:(NSString *)appStoreIDString
 {
-    self.appStoreID = [appStoreIDString longLongValue];
+    self.appStoreID = (NSUInteger)[appStoreIDString longLongValue];
 }
 
 - (void)checkForNewVersionInBackground
@@ -1155,7 +1141,7 @@ static NSString *const iVersionMacAppStoreURLFormat = @"macappstore://itunes.app
         //record that details have been viewed
         self.viewedVersionDetails = YES;
     }
-    else if (buttonIndex == alertView.cancelButtonIndex)
+    else if ( (buttonIndex == alertView.cancelButtonIndex) && ([self.ignoreButtonLabel length] ) )
     {
         //ignore this version
         self.ignoredVersion = latestVersion;
